@@ -23,29 +23,33 @@ cart_df = pd.read_excel(dirname + r'/data/CartCoordinates.xlsx')
 rm_coord_arr = floor_df.loc[:, 'X Coordinate':'Y Coordinate'].to_numpy()
 ct_coord_arr = cart_df.loc[:, 'X Coordinate':'Y Coordinate'].to_numpy()
 
-# Sample distribution to assign average # of trips per room
-trip_samples = choices(trip_data_from_dist, prob_data_from_dist, k=rm_coord_arr.shape[0])
+base_configuration_load_distance_score_arr = []
+for index in range (100):
+    # Sample distribution to assign average # of trips per room
+    trip_samples = choices(trip_data_from_dist, prob_data_from_dist, k=rm_coord_arr.shape[0])
 
-# Obtain load distance score for base configuration layout
-load_dist = []
-for rm_index in range(rm_coord_arr.shape[0]):
-    rm_xcoord = rm_coord_arr[rm_index][0]
-    rm_ycoord = rm_coord_arr[rm_index][1]
-    ct1_xcoord = ct_coord_arr[0][0]
-    ct1_ycoord = ct_coord_arr[0][1]
-    ct2_xcoord = ct_coord_arr[1][0]
-    ct2_ycoord = ct_coord_arr[1][1]
+    # Obtain load distance score for base configuration layout
+    load_dist = []
+    for rm_index in range(rm_coord_arr.shape[0]):
+        rm_xcoord = rm_coord_arr[rm_index][0]
+        rm_ycoord = rm_coord_arr[rm_index][1]
+        ct1_xcoord = ct_coord_arr[0][0]
+        ct1_ycoord = ct_coord_arr[0][1]
+        ct2_xcoord = ct_coord_arr[1][0]
+        ct2_ycoord = ct_coord_arr[1][1]
 
-    rm_ct1_dist = distance(rm_xcoord, rm_ycoord, ct1_xcoord, ct1_ycoord)
-    rm_ct2_dist = distance(rm_xcoord, rm_ycoord, ct2_xcoord, ct2_ycoord)
+        rm_ct1_dist = distance(rm_xcoord, rm_ycoord, ct1_xcoord, ct1_ycoord)
+        rm_ct2_dist = distance(rm_xcoord, rm_ycoord, ct2_xcoord, ct2_ycoord)
 
-    # Select smaller distance to cart
-    rm_ct_dist = min(rm_ct1_dist, rm_ct2_dist)
+        # Select smaller distance to cart
+        rm_ct_dist = min(rm_ct1_dist, rm_ct2_dist)
 
-    # Calculate current load-distance score
-    load_dist.append(rm_ct_dist*trip_samples[rm_index])
+        # Calculate current load-distance score
+        load_dist.append(rm_ct_dist*trip_samples[rm_index])
 
-base_configuration_load_distance_score = sum(load_dist)
+    base_configuration_load_distance_score_arr.append(sum(load_dist))
+base_configuration_load_distance_score = sum(base_configuration_load_distance_score_arr) \
+                                         / len(base_configuration_load_distance_score_arr)
 
 # Obtain all possible cart locations and corresponding load-distance scores
 floor_xlength = 128.0  # [ft]

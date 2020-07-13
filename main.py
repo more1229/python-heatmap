@@ -6,4 +6,4 @@
 # import lds.analysis as anas
 
 # Plot the data
-# import lds.plotting as plot
+import lds.plotting as plot
